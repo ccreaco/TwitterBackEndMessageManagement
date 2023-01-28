@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: message-app
+spec:
+  selector:
+    matchLabels:
+      app: message-app
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: message-app
+    spec:
+      containers:
+        - name: message-app
+          image: message-app-v2:1.0
+          ports:
+            - containerPort: 8081
+          env:   # Setting Environmental Variables
+            - name: DB_HOST   # Setting Database host address
+              value: mysql
+            - name: DB_NAME  # Setting Database name
+              value: content_management
+            - name: DB_USERNAME  # Setting Database username
+              value: root
+            - name: DB_PASSWORD # Setting Database password
+              value: password
+# This seperator --- below is MANDATORY!!!
+---
+# Define a 'Service' To Expose the application
+apiVersion: v1
+kind: Service
+metadata:
+  name: messageapp-service
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 8081    # Port inside the cluster
+      targetPort: 8081  # Port exposed to the outside
+  selector:
+    app: message-app
+  type: NodePort
